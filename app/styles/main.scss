@@ -1,0 +1,9 @@
+@use './base.scss';
+@use './button.scss';
+@use './title.scss' as *;
+
+/* Classe personnalisée réutilisable */
+.titreP {
+  font-weight: bold;
+  @include texte;
+}
