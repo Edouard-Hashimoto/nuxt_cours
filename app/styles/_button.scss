@@ -1,0 +1,76 @@
+@use './foundations/functions' as *;
+
+.button {
+  /* VARIANTES */
+  &.-secondary {
+    --button-bg-color: var(--color-secondary);
+    --button-border-color: var(--color-secondary);
+    --button-color: var(--color-text-light);
+
+    &:hover {
+      --button-bg-color: transparent;
+      --button-color: var(--color-secondary);
+    }
+  }
+
+  &.-danger {
+    --button-bg-color: var(--color-danger);
+    --button-border-color: var(--color-danger);
+    --button-color: #fff;
+
+    &:hover {
+      --button-bg-color: transparent;
+      --button-color: var(--color-danger);
+    }
+  }
+
+  &.-ghost {
+    --button-bg-color: transparent;
+    --button-border-color: transparent;
+    --button-color: var(--color-primary);
+
+    &:hover {
+      --button-bg-color: var(--color-primary);
+      --button-color: #fff;
+    }
+  }
+
+  &.-menu,
+  &.-submit {
+    --button-bg-color: var(--color-success);
+    --button-border-color: var(--color-success);
+    --button-color: #fff;
+
+    &:hover {
+      --button-bg-color: transparent;
+      --button-color: var(--color-success);
+    }
+  }
+
+  /* TAILLES */
+  &.-small {
+    padding: rem(5) rem(10);
+    font-size: var(--font-size-small);
+  }
+
+  &.-medium {
+    padding: rem(12) rem(22);
+    font-size: var(--font-size-base);
+  }
+
+  &.-large {
+    padding: rem(65) rem(100);
+    font-size: var(--font-size-large);
+  }
+
+  /* FORMES */
+  &.-rounded {
+    border-radius: 60px;
+  }
+
+  &.-block {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+}

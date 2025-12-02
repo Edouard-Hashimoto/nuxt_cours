@@ -1,0 +1,40 @@
+@use './foundations/functions' as *;
+
+/* Style de base pour tous les titres */
+.title {
+  font-size: rem(60);
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+/* Mixins */
+@mixin subtitle {
+  font-size: rem(10);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@mixin texte {
+  font-size: rem(30);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Classes pour MyTitle */
+.title.-subtitle {
+  @include subtitle;
+}
+
+.title.-texte {
+  @include texte;
+}
+
+.title.-texte2 {
+  font-size: rem(50);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Variante light */
+.title.-light {
+  font-weight: 300; /* ou 'lighter' selon ton besoin */
+  color: #555; /* optionnel, tu peux définir une couleur plus claire */
+  font-size: rem(30);
+  font-family: Arial, Helvetica, sans-serif;
+}
