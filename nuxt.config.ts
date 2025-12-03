@@ -2,7 +2,12 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  css: ["~/styles/main.scss"],
+  css: [
+    "~/styles/base.scss",
+    "~/styles/main.scss",
+    "~/styles/title.scss",
+    "~/styles/_button.scss", // important
+  ],
   vite: {
     css: {
       preprocessorOptions: {

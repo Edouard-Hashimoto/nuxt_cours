@@ -4,6 +4,7 @@ const route = useRoute();
 
 
 
+
 const { data: recipe, error } = await useAsyncData(
   `recipe-${route.params.id}`,
   async () => {
@@ -20,16 +21,23 @@ if (!recipe.value || error.value) {
     statusMessage: "Recipe not found",
   });
 }
+
+useHead({
+  title: 'Mes recettes | Recettes',
+  meta: [
+    {name: 'description', content: recipe.value?.description}
+  ]
+})
 </script>
 
 <template>
-  <div v-if="recipe">
-    <h1>{{ recipe.title }}</h1>
-    <p><strong>Description:</strong> {{ recipe.description }}</p>
-    <p><strong>Cuisine:</strong> {{ recipe.cuisine_name }}</p>
-    <p><strong>Goal:</strong> {{ recipe.goal_name }}</p>
-    <p><strong>Diet:</strong> {{ recipe.diet_name }}</p>
-    <p><strong>Allergies:</strong> {{ recipe.allergy_name }}</p>
+  <div v-if="recipe" class="contenue">
+    <h1 class="title -primary -mono">{{ recipe.title }}</h1>
+    <p class="title -sm -light"><strong>Description:</strong> {{ recipe.description }}</p>
+    <p class="title -sm -light"><strong>Cuisine:</strong> {{ recipe.cuisine_name }}</p>
+    <p class="title -sm -light"><strong>Goal:</strong> {{ recipe.goal_name }}</p>
+    <p class="title -sm -light"><strong>Diet:</strong> {{ recipe.diet_name }}</p>
+    <p class="title -sm -light"><strong>Allergies:</strong> {{ recipe.allergy_name }}</p>
 
     <h2>Ingredients</h2>
     <ul>
@@ -56,12 +64,10 @@ html, body {
   color: #333;
 }
 
-div {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 12px;
+.contenue {
+  margin: 30px auto;
+  padding-left: 400px;
+  padding-right: 400px;
 }
 
 h1 {
@@ -80,11 +86,7 @@ h2 {
   padding-bottom: 5px;
 }
 
-p {
-  line-height: 1.6;
-  margin: 5px 0;
-  font-size: 1rem;
-}
+
 
 ul {
   list-style: none;

@@ -1,40 +1,130 @@
 @use './foundations/functions' as *;
 
-/* Style de base pour tous les titres */
+/* -----------------------------
+   MIXINS
+------------------------------ */
+
+@mixin title-size($size) {
+  font-size: rem($size);
+  line-height: 1.2;
+}
+
+@mixin title-font($weight: 600, $family: "Inter", $style: normal) {
+  font-family: $family, sans-serif;
+  font-weight: $weight;
+  font-style: $style;
+}
+
+@mixin title-color($color) {
+  color: $color;
+}
+
+/* -----------------------------
+   BASE
+------------------------------ */
+
 .title {
-  font-size: rem(60);
-  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  @include title-font(600);
+  margin: 0 0 rem(10) 0;
+  display: block;
 }
 
-/* Mixins */
-@mixin subtitle {
-  font-size: rem(10);
-  font-family: Arial, Helvetica, sans-serif;
+
+/* -----------------------------
+   VARIANTES — TAILLES
+------------------------------ */
+
+.title.-xs     { @include title-size(12); }
+.title.-sm     { @include title-size(18); }
+.title.-md     { @include title-size(24); }
+.title.-lg     { @include title-size(32); }
+.title.-xl     { @include title-size(48); }
+.title.-xxl    { @include title-size(64); }
+.title.-hero   { @include title-size(90); font-weight: 800; }
+
+/* Special display text */
+.title.-display {
+  @include title-size(120);
+  @include title-font(900, "Impact");
+  text-transform: uppercase;
 }
 
-@mixin texte {
-  font-size: rem(30);
-  font-family: Arial, Helvetica, sans-serif;
+
+/* -----------------------------
+   VARIANTES — POIDS & STYLE
+------------------------------ */
+
+.title.-light      { @include title-font(300); }
+.title.-regular    { @include title-font(400); }
+.title.-medium     { @include title-font(500); }
+.title.-semibold   { @include title-font(600); }
+.title.-bold       { @include title-font(700); }
+.title.-black      { @include title-font(900); }
+
+.title.-italic     { font-style: italic; }
+.title.-uppercase  { text-transform: uppercase; }
+.title.-lowercase  { text-transform: lowercase; }
+.title.-capitalize { text-transform: capitalize; }
+
+
+/* -----------------------------
+   VARIANTES — COULEURS
+------------------------------ */
+
+.title.-primary   { @include title-color(var(--color-primary)); }
+.title.-secondary { @include title-color(var(--color-secondary)); }
+.title.-danger    { @include title-color(var(--color-danger)); }
+.title.-success   { @include title-color(var(--color-success)); }
+.title.-muted     { @include title-color(#777); }
+
+
+/* -----------------------------
+   VARIANTES — EFFETS
+------------------------------ */
+
+.title.-shadow {
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* Classes pour MyTitle */
-.title.-subtitle {
-  @include subtitle;
+.title.-outline {
+  color: transparent;
+  -webkit-text-stroke: 2px currentColor;
 }
 
-.title.-texte {
-  @include texte;
+.title.-glow {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px rgba(0, 170, 255, 0.8);
 }
 
-.title.-texte2 {
-  font-size: rem(50);
-  font-family: Arial, Helvetica, sans-serif;
+/* Gradient text */
+.title.-gradient {
+  background: linear-gradient(45deg, #ff0066, #ffcc00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Variante light */
-.title.-light {
-  font-weight: 300; /* ou 'lighter' selon ton besoin */
-  color: #555; /* optionnel, tu peux définir une couleur plus claire */
-  font-size: rem(30);
-  font-family: Arial, Helvetica, sans-serif;
+
+/* -----------------------------
+   VARIANTES — TYPO SPÉCIALE
+------------------------------ */
+
+.title.-impact {
+  @include title-font(800, "Impact");
 }
+
+.title.-serif {
+  font-family: "Times New Roman", serif;
+  font-weight: 700;
+}
+
+.title.-mono {
+  font-family: "Courier New", monospace;
+}
+
+
+/* -----------------------------
+   SPACING
+------------------------------ */
+
+.title.-tight { letter-spacing: -1px; }
+.title.-wide  { letter-spacing: 3px; }
