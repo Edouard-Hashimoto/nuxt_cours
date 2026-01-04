@@ -1,155 +1,166 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import AddRecipe from "../../src/components/AddRecipeForm.vue";
+import { computed, ref } from "vue";
 
 useHead({
-  title: "Mes recettes | Accueil",
+  title: "Cuisine | Accueil",
   meta: [
-    { name: "description", content: "Page d'accueil de mon site de recettes" },
+    {
+      name: "description",
+      content: "Explorez nos délicieuses recettes de cuisine",
+    },
   ],
 });
 
-const { data: recipe, error } = await useAsyncData("recipes", async () => {
-  const { data } = await $fetch<{ data: Recipe[] }>(
-    "http://localhost:4000/api/recipes"
-  );
-  return data;
-});
+const { data: recipes, error: recipesError } = await useAsyncData(
+  "recipes-homepage",
+  async () => {
+    const { data } = await $fetch<{ data: Recipe[] }>(
+      "http://localhost:4000/api/recipes"
+    );
+    return data;
+  }
+);
 
-const { data: cuisine } = await useAsyncData("cuisines", async () => {
+const { data: cuisines } = await useAsyncData("cuisines-homepage", async () => {
   const { data } = await $fetch<{ data: Cuisine[] }>(
     "http://localhost:4000/api/cuisines"
   );
   return data;
 });
 
-const page = ref(1);
-const RECIPES_PER_PAGE = 3;
-
-const search = ref("");
-const filters = ref<string[]>([]);
-
-function onCheckboxInput($event: Event) {
-  const target = $event.target;
-  if (!(target instanceof HTMLInputElement)) return;
-
-  const value = target.value;
-  const index = filters.value.indexOf(value);
-
-  if (index === -1) filters.value.push(value);
-  else filters.value.splice(index, 1);
-}
+const selectedCuisine = ref<string>("");
 
 const filteredRecipes = computed<Recipe[]>(() => {
-  if (!recipe.value) return [];
-
-  let result = recipe.value;
-
-  if (search.value.trim() !== "") {
-    const s = search.value.toLowerCase();
-    result = result.filter((r) => r.title.toLowerCase().includes(s));
-  }
-
-  if (filters.value.length) {
-    result = result.filter((r) => filters.value.includes(r.cuisine_name));
-  }
-
-  return result;
+  if (!recipes.value) return [];
+  if (!selectedCuisine.value) return recipes.value.slice(0, 6);
+  return recipes.value
+    .filter((r) => r.cuisine_name === selectedCuisine.value)
+    .slice(0, 6);
 });
 
-const totalPages = computed(() => {
-  return Math.ceil(filteredRecipes.value.length / RECIPES_PER_PAGE);
+const featuredRecipes = computed<Recipe[]>(() => {
+  if (!recipes.value) return [];
+  return recipes.value.slice(0, 3);
 });
-
-const displayedRecipes = computed<Recipe[]>(() => {
-  if (!filteredRecipes.value.length) return [];
-
-  return filteredRecipes.value.slice(
-    (page.value - 1) * RECIPES_PER_PAGE,
-    page.value * RECIPES_PER_PAGE
-  );
-});
-
-function nextPage() {
-  if (page.value < totalPages.value) page.value++;
-}
-
-function prevPage() {
-  if (page.value > 1) page.value--;
-}
-
-if (error && error.value) throw new Error("Failed to fetch recipes");
 </script>
 
 <template>
   <div class="contenue">
+    <h1 class="title -display -gradient">Bienvenue dans notre Cuisine</h1>
+    <p class="subtitle">
+      Découvrez des recettes délicieuses et faciles à préparer
+    </p>
 
-    <h1 class="title -display -gradient">Site Recettes</h1>
-    <!-- RECHERCHE -->
-    <input
-      v-model="search"
-      type="text"
-      placeholder="Rechercher une recette..."
-    />
+    <!-- Recettes à la Une -->
+    <div>
+      <h2>Recettes à la Une</h2>
+      <p>Nos meilleures recettes sélectionnées pour vous</p>
 
-    <!-- FILTRES CUISINES -->
-    <div class="recipes-filters">
-      <div
-        v-for="(cuisines, index) in cuisine"
-        :key="index"
-        class="recipes-filters__item"
-      >
-        <input
-          :id="cuisines.name"
-          type="checkbox"
-          :value="cuisines.name"
-          @input="onCheckboxInput"
-        />
-        <label :for="cuisines.name">{{ cuisines.name }}</label>
+      <div v-if="recipesError" class="error">
+        Erreur lors du chargement des recettes
       </div>
-    </div>
 
-    <div>
-      <p>Recettes trouvées : {{ filteredRecipes.length }}</p>
-      <p>Page : {{ page }} / {{ totalPages }}</p>
-      <p>Filtres : {{ filters }}</p>
-    </div>
-
-    <!-- LISTE DES RECETTES -->
-    <div>
-      <p>Liste des recettes :</p>
-      <ul>
-        <li v-for="(recipes, index) in displayedRecipes" :key="index">
-          <NuxtLink :to="`/recipe/${recipes.recipe_id}`">
-            {{ recipes.title }}
-          </NuxtLink>
+      <ul v-else>
+        <li
+          v-for="recipe in featuredRecipes"
+          :key="recipe.recipe_id"
+          class="recipe-card"
+        >
+          <NuxtImg
+            :src="'/recipes/' + recipe.image_url"
+            :alt="recipe.title"
+            class="recipe-image"
+          />
+          <div>
+            <NuxtLink :to="`/recipe/${recipe.recipe_id}`">
+              {{ recipe.title }}
+            </NuxtLink>
+            <p>{{ recipe.description.substring(0, 80) }}...</p>
+            <div class="recipe-meta">
+              <span v-if="recipe.cuisine_name" class="badge">
+                {{ recipe.cuisine_name }}
+              </span>
+              <span v-if="recipe.diet_name" class="badge">
+                {{ recipe.diet_name }}
+              </span>
+            </div>
+          </div>
         </li>
       </ul>
     </div>
 
-    <!-- PAGINATION -->
-    <div class="pagination">
-      <button
-        class="button -secondary -medium"
-        @click="prevPage"
-        :disabled="page === 1"
-      >
-        ◀ Page précédente
-      </button>
+    <!-- Explorez par Cuisine -->
+    <div>
+      <h2>Explorez par Cuisine</h2>
+      <p>Sélectionnez une cuisine pour voir toutes les recettes</p>
 
-      <span>Page {{ page }} / {{ totalPages }}</span>
+      <div class="recipes-filters">
+        <div class="recipes-filters__item">
+          <input
+            id="all"
+            type="radio"
+            name="cuisine"
+            :checked="selectedCuisine === ''"
+            @change="selectedCuisine = ''"
+          />
+          <label for="all">Toutes</label>
+        </div>
+        <div
+          v-for="cuisine in cuisines"
+          :key="cuisine.name"
+          class="recipes-filters__item"
+        >
+          <input
+            :id="cuisine.name"
+            type="radio"
+            name="cuisine"
+            :value="cuisine.name"
+            :checked="selectedCuisine === cuisine.name"
+            @change="selectedCuisine = cuisine.name"
+          />
+          <label :for="cuisine.name">{{ cuisine.name }}</label>
+        </div>
+      </div>
 
-      <button
-        class="button -secondary -medium"
-        @click="nextPage"
-        :disabled="page === totalPages"
-      >
-        Page suivante ▶
-      </button>
+      <ul>
+        <li
+          v-for="recipe in filteredRecipes"
+          :key="recipe.recipe_id"
+          class="recipe-card"
+        >
+          <NuxtImg
+            :src="'/recipes/' + recipe.image_url"
+            :alt="recipe.title"
+            class="recipe-image"
+          />
+          <div>
+            <NuxtLink :to="`/recipe/${recipe.recipe_id}`">
+              {{ recipe.title }}
+            </NuxtLink>
+            <p>{{ recipe.description.substring(0, 80) }}...</p>
+            <div class="recipe-meta">
+              <span v-if="recipe.cuisine_name" class="badge">
+                {{ recipe.cuisine_name }}
+              </span>
+              <span v-if="recipe.diet_name" class="badge">
+                {{ recipe.diet_name }}
+              </span>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
 
-    <div>
-      <AddRecipe />
+    <!-- CTA -->
+    <div class="cta-section">
+      <h2>Prêt à cuisiner ?</h2>
+      <p>
+        Parcourez notre collection complète de recettes et trouvez votre
+        prochaine création culinaire
+      </p>
+      <NuxtLink to="/recipe" class="button -secondary -medium">
+        Voir toutes les recettes
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -170,20 +181,22 @@ body {
   padding-right: 400px;
 }
 
-input[type="text"] {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 25px;
-  font-size: 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+.subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 40px;
+}
 
-  &:focus {
-    border-color: #00796b;
-    box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.2);
-    outline: none;
-  }
+h2 {
+  font-size: 2rem;
+  margin-top: 50px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+p {
+  color: #666;
+  margin-bottom: 20px;
 }
 
 .recipes-filters {
@@ -237,10 +250,66 @@ a {
   }
 }
 
-.pagination {
-  margin-top: 25px;
+.recipe-image {
+  width: 100%;
+  max-width: 220px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+  }
+}
+
+.recipe-card {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 20px;
+}
+
+.recipe-meta {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background-color: #eef7f6;
+  color: #00796b;
+  border: 1px solid #e0eceb;
+}
+
+.cta-section {
+  margin-top: 60px;
+  padding: 40px;
+  background-color: #eef7f6;
+  border-radius: 12px;
+  text-align: center;
+
+  h2 {
+    margin-top: 0;
+  }
+
+  p {
+    margin-bottom: 30px;
+  }
+}
+
+.error {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  margin: 30px 0;
 }
 </style>

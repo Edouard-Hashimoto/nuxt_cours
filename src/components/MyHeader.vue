@@ -1,4 +1,11 @@
 <script lang="ts" setup>
+import type {SanitySiteSettings} from "~/types/cms/sanitySiteSettings";
+
+defineProps<{
+  logo: SanitySiteSettings["logo"],
+  navigation: SanitySiteSettings["navigation"];
+}>();
+
 const isNavOpen = ref(false)
 
 const onMenuClick = () => {
@@ -17,7 +24,7 @@ const onMenuClick = () => {
 
     <nav :class="{ open: isNavOpen }">
       <ul>
-        <li><a href="/recipe/1">Recettes</a></li>
+        <li><a href="/recipe">Recettes</a></li>
         <li><a href="#">Ingrédients</a></li>
         <li><a href="#">Contact</a></li>
       </ul>
@@ -42,7 +49,7 @@ const onMenuClick = () => {
   .logo {
     font-size: 1.7rem;
     font-weight: bold;
-    color: #a6581a;
+    color: black;
   }
 
   .menu-btn {
