@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type {SanitySiteSettings} from "~/types/cms/sanitySiteSettings";
+import type { SanitySiteSettings } from "~/types/cms/sanitySiteSettings";
 
 defineProps<{
-  logo: SanitySiteSettings["logo"],
-  navigation: SanitySiteSettings["navigation"];
+  logo?: SanitySiteSettings["logo"], // Optionnel pour éviter les erreurs de build
+  navigation?: SanitySiteSettings["navigation"];
 }>();
 
 const isNavOpen = ref(false)
@@ -11,21 +11,27 @@ const isNavOpen = ref(false)
 const onMenuClick = () => {
   isNavOpen.value = !isNavOpen.value
 }
+
+// Ferme le menu automatiquement lors d'un clic sur un lien (mobile)
+const closeNav = () => {
+  isNavOpen.value = false
+}
 </script>
 
 <template>
   <header class="header">
-    <a href="/"><div class="logo">R505 | Cuisine</div></a>
-    
+    <NuxtLink to="/" class="logo-link">
+      <div class="logo">R505 | Cuisine</div>
+    </NuxtLink>
 
     <MyButton class="menu-btn" @click="onMenuClick">
       {{ isNavOpen ? 'Fermer' : 'Menu' }}
     </MyButton>
 
     <nav :class="{ open: isNavOpen }">
-      <ul>
-        <li><a href="/recipe">Recettes</a></li>
-        <li><a href="/auth">Connexion</a></li>
+      <ul class="nav-list">
+        <li><NuxtLink to="/recipe" @click="closeNav">Recettes</NuxtLink></li>
+        <li><NuxtLink to="/auth" @click="closeNav">Connexion</NuxtLink></li>
       </ul>
     </nav>
   </header>
@@ -33,11 +39,10 @@ const onMenuClick = () => {
 
 <style lang="scss">
 .header {
-  position: relative;  
-  width: 100%;         
-  max-width: 100%;    
-  margin: 0;           
-
+  position: sticky; // Reste en haut au scroll
+  top: 0;
+  z-index: 100;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -45,34 +50,52 @@ const onMenuClick = () => {
   background: #fef7f2;
   border-bottom: 2px solid #e4c5a1;
 
-  .logo {
-    font-size: 1.7rem;
-    font-weight: bold;
-    color: black;
+  .logo-link {
+    text-decoration: none;
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
   }
 
-  .menu-btn {
-    display: block;
-    z-index: 20;
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    
+    a {
+      text-decoration: none;
+      color: #2c3e50;
+      font-weight: 500;
+      &:hover { color: #4CAF50; }
+    }
   }
 
+  // --- MOBILE STYLE ---
   nav {
     position: absolute;
-    top: 70px;
-    right: 0;
-    width: 200px;
+    top: 100%; // Juste sous le header
+    left: 0;
+    width: 100%;
     background: white;
-    border-left: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    padding: 1rem;
+    padding: 1.5rem;
     display: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
 
     &.open {
       display: block;
     }
+
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+    }
   }
 
+  // --- DESKTOP STYLE (768px +) ---
   @media (min-width: 768px) {
     .menu-btn {
       display: none;
@@ -84,20 +107,13 @@ const onMenuClick = () => {
       width: auto;
       padding: 0;
       background: none;
-      border: none;
       box-shadow: none;
 
       ul {
-        display: flex;
-        gap: 2rem;
+        flex-direction: row;
+        gap: 2.5rem;
       }
     }
   }
 }
-
-/* Empêche complètement le scroll horizontal */
-body {
-  overflow-x: hidden;
-}
-
 </style>
