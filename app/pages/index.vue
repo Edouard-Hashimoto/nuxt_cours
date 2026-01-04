@@ -6,14 +6,11 @@ const config = useRuntimeConfig();
 useHead({
   title: "Cuisine | Accueil",
   meta: [
-    {
-      name: "description",
-      content: "Explorez nos délicieuses recettes de cuisine",
-    },
+    { name: "description", content: "Explorez nos délicieuses recettes de cuisine" },
   ],
 });
 
-// Utilisation de config.public.apiUrl pour éviter le localhost en dur
+// 1. Récupération des données via l'URL d'API du .env
 const { data: recipes, error: recipesError } = await useAsyncData(
   "recipes-homepage",
   async () => {
@@ -31,14 +28,28 @@ const { data: cuisines } = await useAsyncData("cuisines-homepage", async () => {
   return data;
 });
 
+// 2. Variables de filtrage
 const selectedCuisine = ref<string>("");
+const search = ref("");
 
+// 3. Logique de filtrage combinée (Recherche + Cuisine)
 const filteredRecipes = computed<Recipe[]>(() => {
   if (!recipes.value) return [];
-  const base = selectedCuisine.value 
-    ? recipes.value.filter((r) => r.cuisine_name === selectedCuisine.value)
-    : recipes.value;
-  return base.slice(0, 6);
+  
+  let result = recipes.value;
+
+  // Filtre par texte (nom de recette)
+  if (search.value.trim() !== "") {
+    const s = search.value.toLowerCase();
+    result = result.filter((r) => r.title.toLowerCase().includes(s));
+  }
+
+  // Filtre par catégorie de cuisine
+  if (selectedCuisine.value !== "") {
+    result = result.filter((r) => r.cuisine_name === selectedCuisine.value);
+  }
+
+  return result.slice(0, 6); // Limite à 6 résultats pour l'accueil
 });
 
 const featuredRecipes = computed<Recipe[]>(() => {
@@ -51,10 +62,10 @@ const featuredRecipes = computed<Recipe[]>(() => {
   <div class="contenue">
     <header class="hero">
       <h1 class="title -display -gradient">Bienvenue dans notre Cuisine</h1>
-      <p class="subtitle">
-        Découvrez des recettes délicieuses et faciles à préparer
-      </p>
+      <p class="subtitle">Découvrez des recettes délicieuses et faciles à préparer</p>
     </header>
+
+    
 
     <section class="section">
       <div class="section-header">
@@ -63,24 +74,14 @@ const featuredRecipes = computed<Recipe[]>(() => {
       </div>
 
       <div v-if="recipesError" class="error">
-        Erreur lors du chargement des recettes
+        Erreur lors du chargement des recettes. Vérifiez votre API URL.
       </div>
 
       <div v-else class="recipe-grid">
-        <div
-          v-for="recipe in featuredRecipes"
-          :key="recipe.recipe_id"
-          class="recipe-card"
-        >
-          <NuxtImg
-            :src="'/recipes/' + recipe.image_url"
-            :alt="recipe.title"
-            class="recipe-card__image"
-          />
+        <div v-for="recipe in featuredRecipes" :key="recipe.recipe_id" class="recipe-card">
+          <NuxtImg :src="'/recipes/' + recipe.image_url" :alt="recipe.title" class="recipe-card__image" />
           <div class="recipe-card__body">
-            <NuxtLink :to="`/recipe/${recipe.recipe_id}`" class="recipe-card__title">
-              {{ recipe.title }}
-            </NuxtLink>
+            <NuxtLink :to="`/recipe/${recipe.recipe_id}`" class="recipe-card__title">{{ recipe.title }}</NuxtLink>
             <p class="recipe-card__desc">{{ recipe.description.substring(0, 80) }}...</p>
             <div class="recipe-meta">
               <span v-if="recipe.cuisine_name" class="badge">{{ recipe.cuisine_name }}</span>
@@ -94,8 +95,16 @@ const featuredRecipes = computed<Recipe[]>(() => {
     <section class="section">
       <div class="section-header">
         <h2>Explorez par Cuisine</h2>
-        <p>Sélectionnez une cuisine pour voir toutes les recettes</p>
+        <p>Sélectionnez une cuisine pour affiner les résultats</p>
       </div>
+      <div class="search-container">
+      <input 
+        v-model="search" 
+        type="text" 
+        placeholder="Rechercher une recette par nom..." 
+        class="search-input"
+      />
+    </div>
 
       <div class="recipes-filters">
         <div class="recipes-filters__item">
@@ -109,20 +118,10 @@ const featuredRecipes = computed<Recipe[]>(() => {
       </div>
 
       <div class="recipe-grid">
-        <div
-          v-for="recipe in filteredRecipes"
-          :key="recipe.recipe_id"
-          class="recipe-card"
-        >
-          <NuxtImg
-            :src="'/recipes/' + recipe.image_url"
-            :alt="recipe.title"
-            class="recipe-card__image"
-          />
+        <div v-for="recipe in filteredRecipes" :key="recipe.recipe_id" class="recipe-card">
+          <NuxtImg :src="'/recipes/' + recipe.image_url" :alt="recipe.title" class="recipe-card__image" />
           <div class="recipe-card__body">
-            <NuxtLink :to="`/recipe/${recipe.recipe_id}`" class="recipe-card__title">
-              {{ recipe.title }}
-            </NuxtLink>
+            <NuxtLink :to="`/recipe/${recipe.recipe_id}`" class="recipe-card__title">{{ recipe.title }}</NuxtLink>
             <p class="recipe-card__desc">{{ recipe.description.substring(0, 80) }}...</p>
             <div class="recipe-meta">
               <span v-if="recipe.cuisine_name" class="badge">{{ recipe.cuisine_name }}</span>
@@ -131,6 +130,8 @@ const featuredRecipes = computed<Recipe[]>(() => {
           </div>
         </div>
       </div>
+      
+      <p v-if="filteredRecipes.length === 0" class="no-results">Aucune recette ne correspond à votre recherche.</p>
     </section>
 
     <div class="cta-section">
@@ -155,66 +156,70 @@ const featuredRecipes = computed<Recipe[]>(() => {
 
 .hero {
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
   .title { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 1rem; }
 }
 
-.section { margin-bottom: 60px; }
+/* BARRE DE RECHERCHE */
+.search-container {
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
+.search-input {
+  width: 100%;
+  padding: 14px 20px;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s;
+  &:focus { outline: none; border-color: #4fd1c5; box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1); }
+}
+
+.section { margin-bottom: 60px; }
 .section-header { margin-bottom: 30px; h2 { margin-bottom: 10px; } }
 
-// GRILLE DE RECETTES RESPONSIVE
+/* GRILLE RESPONSIVE */
 .recipe-grid {
   display: grid;
-  grid-template-columns: 1fr; // 1 colonne sur mobile
+  grid-template-columns: 1fr;
   gap: 25px;
-
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr); // 2 colonnes sur tablette
-  }
-
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr); // 3 colonnes sur desktop
-  }
+  @media (min-width: 768px) { grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 1024px) { grid-template-columns: repeat(3, 1fr); }
 }
 
 .recipe-card {
   background: #111;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   display: flex;
-  flex-direction: column; // Image au dessus du texte
+  flex-direction: column;
   transition: transform 0.3s ease;
-
   &:hover { transform: translateY(-5px); }
 
-  &__image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-  }
-
+  &__image { width: 100%; height: 200px; object-fit: cover; }
   &__body { padding: 20px; }
-  &__title { font-size: 1.2rem; font-weight: 700; color: #4fd1c5; margin-bottom: 10px; display: block; }
+  &__title { font-size: 1.2rem; font-weight: 700; color: #4fd1c5; text-decoration: none; margin-bottom: 10px; display: block; }
   &__desc { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
 }
 
+/* FILTRES AVEC TEXTE BLANC */
 .recipes-filters {
   display: flex;
   gap: 10px;
-  flex-wrap: nowrap;
-  overflow-x: auto; // Scroll horizontal sur mobile
+  overflow-x: auto;
   padding-bottom: 15px;
   margin-bottom: 30px;
-  
-  // Cache la scrollbar mais permet le scroll
-  scrollbar-width: none; 
+  scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
 
 .recipes-filters__item {
-  flex: 0 0 auto; // Empêche de rétrécir
+  flex: 0 0 auto;
   background-color: #151515;
   padding: 8px 16px;
   border-radius: 20px;
@@ -222,6 +227,9 @@ const featuredRecipes = computed<Recipe[]>(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+  color: #fff; // Texte blanc pour lisibilité
+  label { cursor: pointer; color: #fff; }
+  input[type="radio"] { cursor: pointer; accent-color: #4fd1c5; }
 }
 
 .cta-section {
@@ -235,7 +243,7 @@ const featuredRecipes = computed<Recipe[]>(() => {
 .btn-secondary {
   display: inline-block;
   background: #0f766e;
-  color: #f8fafc;
+  color: #fff;
   padding: 12px 24px;
   border-radius: 8px;
   text-decoration: none;
@@ -252,4 +260,7 @@ const featuredRecipes = computed<Recipe[]>(() => {
   font-size: 0.8rem;
   margin-right: 5px;
 }
+
+.no-results { text-align: center; color: #666; font-style: italic; }
+.error { background: #450a0a; color: #fca5a5; padding: 15px; border-radius: 8px; }
 </style>

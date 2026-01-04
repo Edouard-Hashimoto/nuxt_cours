@@ -290,4 +290,38 @@ input[type="text"] {
   text-decoration: none;
   font-weight: bold;
 }
+
+.recipes-filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #e0eceb;
+    font-size: 0.9rem;
+    
+    // AJOUT : Force la couleur du texte et du label en noir
+    color: #000; 
+
+    label {
+      cursor: pointer;
+      color: #000; // Assure que le texte du label est bien noir
+    }
+
+    input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    &:hover {
+      background-color: #f0f0f0; // Un léger gris au survol pour le contraste
+    }
+  }
+}
 </style>
