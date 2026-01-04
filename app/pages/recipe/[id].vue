@@ -109,6 +109,7 @@ useHead({
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  color: #000;
 }
 
 .recipe-header {
@@ -195,6 +196,8 @@ h2 {
     }
   }
 }
+
+
 
 .alert-allergy {
   color: #d32f2f;
