@@ -1,6 +1,27 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
 const route = useRoute();
+const token = useCookie('recipe_token'); // Récupération du token d'auth
+const router = useRouter();
+
+async function deleteRecipe() {
+  if (!confirm("Voulez-vous vraiment supprimer cette recette ?")) return;
+
+  try {
+    await $fetch(`${config.public.apiUrl}/api/recipes/${route.params.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token.value}`
+      }
+    });
+    
+    alert("Recette supprimée avec succès.");
+    router.push('/'); // Redirection vers l'accueil après suppression
+  } catch (err) {
+    alert("Erreur lors de la suppression. Vérifiez que vous êtes bien l'auteur.");
+  }
+}
+
 
 // Récupération de la recette complète (incluant les ingrédients via votre API)
 const { data: recipe, error } = await useAsyncData(
@@ -67,6 +88,15 @@ useHead({
           </li>
         </ol>
       </section>
+
+      <header class="recipe-header">
+  <div class="header-top">
+    <h1 class="recipe-title">{{ recipe.title }}</h1>
+    <button @click="deleteRecipe" class="btn-delete">
+      Supprimer la recette
+    </button>
+  </div>
+  </header>
     </div>
   </div>
 </template>
