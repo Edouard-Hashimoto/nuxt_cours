@@ -154,9 +154,12 @@ if (error && error.value) throw new Error("Failed to fetch recipes");
         Page suivante ▶
       </button>
     </div>
-
     <div>
-      <AddRecipe />
+      <h2>
+        <NuxtLink class="button -primary -medium" to="/recipe/Ajout">
+          Ajouter une recette
+        </NuxtLink>
+        </h2>
     </div>
   </div>
 </template>
