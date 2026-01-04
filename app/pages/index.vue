@@ -145,6 +145,8 @@ const featuredRecipes = computed<Recipe[]>(() => {
 
 <style lang="scss" scoped>
 .contenue {
+  background: #000;
+  color: #f5f5f5;
   margin: 0 auto;
   padding: 40px 20px;
   width: 100%;
@@ -177,10 +179,10 @@ const featuredRecipes = computed<Recipe[]>(() => {
 }
 
 .recipe-card {
-  background: white;
+  background: #111;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column; // Image au dessus du texte
   transition: transform 0.3s ease;
@@ -194,8 +196,8 @@ const featuredRecipes = computed<Recipe[]>(() => {
   }
 
   &__body { padding: 20px; }
-  &__title { font-size: 1.2rem; font-weight: 700; color: #00796b; margin-bottom: 10px; display: block; }
-  &__desc { font-size: 0.95rem; color: #666; margin-bottom: 15px; }
+  &__title { font-size: 1.2rem; font-weight: 700; color: #4fd1c5; margin-bottom: 10px; display: block; }
+  &__desc { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 15px; }
 }
 
 .recipes-filters {
@@ -213,17 +215,17 @@ const featuredRecipes = computed<Recipe[]>(() => {
 
 .recipes-filters__item {
   flex: 0 0 auto; // Empêche de rétrécir
-  background-color: #eef7f6;
+  background-color: #151515;
   padding: 8px 16px;
   border-radius: 20px;
-  border: 1px solid #e0eceb;
+  border: 1px solid #333;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .cta-section {
-  background-color: #eef7f6;
+  background: linear-gradient(135deg, #0f172a, #0b0f1a);
   padding: 50px 20px;
   border-radius: 20px;
   text-align: center;
@@ -232,8 +234,8 @@ const featuredRecipes = computed<Recipe[]>(() => {
 
 .btn-secondary {
   display: inline-block;
-  background: #00796b;
-  color: white;
+  background: #0f766e;
+  color: #f8fafc;
   padding: 12px 24px;
   border-radius: 8px;
   text-decoration: none;
@@ -244,8 +246,8 @@ const featuredRecipes = computed<Recipe[]>(() => {
 .badge {
   display: inline-block;
   padding: 4px 10px;
-  background: #f0fdfa;
-  color: #0d9488;
+  background: #1f2937;
+  color: #7bdcb5;
   border-radius: 6px;
   font-size: 0.8rem;
   margin-right: 5px;
