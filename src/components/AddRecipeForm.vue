@@ -3,6 +3,17 @@ import { ref } from "vue";
 
 const config = useRuntimeConfig();
 
+const newStepText = ref("");
+
+function addStep() {
+  if (!newStepText.value) return;
+  payload.value.instructions.push({
+    step_number: payload.value.instructions.length + 1,
+    description: newStepText.value
+  });
+  newStepText.value = "";
+}
+
 // 1. Structure du payload avec ingrédients en saisie libre
 const payload = ref({
   title: "",
@@ -13,7 +24,8 @@ const payload = ref({
   DietaryInformation_id: null,
   AllergiesInformation_id: null,
   // On envoie le nom et l'unité en texte brut pour que l'API les traite
-  ingredients: [] as { name: string; quantity: number; unit: string }[] 
+  ingredients: [] as { name: string; quantity: number; unit: string }[],
+  instructions: [] as { step_number: number; description: string }[]
 });
 
 // 2. Variables pour la saisie d'un nouvel ingrédient personnalisé
@@ -81,7 +93,9 @@ async function onSubmit() {
         goal_id: null,
         DietaryInformation_id: null,
         AllergiesInformation_id: null,
-        ingredients: []
+        ingredients: [],
+        instructions: []
+
       };
     } else {
       const errorData = await response.json();
@@ -164,6 +178,19 @@ const { data: goals } = await useAsyncData("goals", () =>
           </select>
         </div>
       </div>
+      <div class="field card">
+    <h3>Instructions de préparation</h3>
+    <div class="flex gap-2">
+      <input v-model="newStepText" placeholder="Décrivez l'étape..." class="flex-1">
+      <button type="button" @click="addStep" class="btn--add">Ajouter l'étape</button>
+    </div>
+    
+    <ol class="mt-4">
+      <li v-for="(step, index) in payload.instructions" :key="index">
+        {{ step.step_number }}. {{ step.description }}
+      </li>
+    </ol>
+  </div>
 
       <button type="submit" class="btn btn--submit">Publier la recette</button>
     </form>
