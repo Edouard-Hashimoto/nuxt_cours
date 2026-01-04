@@ -25,8 +25,7 @@ const onMenuClick = () => {
     <nav :class="{ open: isNavOpen }">
       <ul>
         <li><a href="/recipe">Recettes</a></li>
-        <li><a href="#">Ingrédients</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a href="/auth">Connexion</a></li>
       </ul>
     </nav>
   </header>
