@@ -55,6 +55,11 @@ div {
   padding: 2rem;
 }
 
+h1
+  {
+    color: black;
+  }
+
 .text {
   color: black;
 }
