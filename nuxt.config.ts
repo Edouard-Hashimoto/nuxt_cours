@@ -2,8 +2,16 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  css: ["~/styles/main.scss"],
+  css: [
+    "~/styles/base.scss",
+    "~/styles/main.scss",
+    "~/styles/title.scss",
+    "~/styles/_button.scss", // important
+  ],
   vite: {
+    optimizeDeps: {
+      include: ['react-compiler-runtime', 'react', 'react-dom'],
+    },
     css: {
       preprocessorOptions: {
         scss: {
@@ -13,7 +21,21 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@nuxt/eslint", "@nuxt/image", "@nuxt/test-utils"],
+  modules: [
+    "@nuxt/eslint",
+    "@nuxt/image",
+    "@nuxt/test-utils",
+    "@nuxtjs/sanity",
+  ],
+  sanity: {
+    projectId: "73k1zd4f",
+    dataset: "production",
+    visualEditing: {
+      token: process.env.NUXT_SANITY_API_TOKEN, //required
+      studioUrl: process.env.NUXT_SANITY_STUDIO_URL, //required
+      stega: false,
+    },
+  },
   runtimeConfig: {
     public: {
       apiUrl: "http://localhost:4000",
