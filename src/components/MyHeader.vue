@@ -15,7 +15,7 @@ const onMenuClick = () => {
 
 <template>
   <header class="header">
-    <a href="/"><div class="logo">R505 |Cuisine</div></a>
+    <a href="/"><div class="logo">R505 | Cuisine</div></a>
     
 
     <MyButton class="menu-btn" @click="onMenuClick">

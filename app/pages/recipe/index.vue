@@ -83,7 +83,7 @@ if (error && error.value) throw new Error("Failed to fetch recipes");
 
 <template>
   <div class="contenue">
-    <h1 class="title -display -gradient">Site Recettes</h1>
+    <h1 class="title -display -gradient">Toutes les recettes</h1>
     <!-- RECHERCHE -->
     <input
       v-model="search"
